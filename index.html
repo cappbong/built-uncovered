@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Built Uncovered — Recommended Books, Models &amp; Tools</title>
-  <meta name="description" content="Top books, scale models, and tools featured on Built Uncovered (@BuiltUncoveredUS)." />
+  <title>Built Uncovered — Recommended Books, Scale Models &amp; Tools</title>
+  <meta name="description" content="Top engineering books, collector scale models, and tools featured on Built Uncovered (@BuiltUncoveredUS)." />
   <style>
     * {
       box-sizing: border-box;
@@ -27,14 +27,13 @@
       padding: 20px 16px 0;
     }
 
-    /* Simple, clean channel header */
     .header {
       text-align: center;
       padding: 20px 16px 22px;
       background: #ffffff;
       border-radius: 16px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-      margin-bottom: 22px;
+      margin-bottom: 18px;
       border: 1px solid #e5e7eb;
     }
 
@@ -77,17 +76,66 @@
       border: 1px solid #e5e7eb;
     }
 
+    .action-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .shuffle-btn,
+    .showall-btn {
+      flex: 1;
+      appearance: none;
+      border: 2px solid #cbd5e1;
+      background: #ffffff;
+      color: #0f172a;
+      font-size: 16px;
+      font-weight: 800;
+      padding: 13px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      transition: background 0.12s ease, border-color 0.12s ease, transform 0.1s ease;
+    }
+
+    .shuffle-btn {
+      background: #1e293b;
+      color: #ffffff;
+      border-color: #1e293b;
+    }
+
+    .shuffle-btn:hover,
+    .shuffle-btn:active {
+      background: #0f172a;
+      transform: translateY(-1px);
+    }
+
+    .showall-btn:hover,
+    .showall-btn:active {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+    }
+
     .section-heading {
       font-size: 19px;
       font-weight: 800;
       color: #111827;
-      margin: 26px 4px 12px;
+      margin: 24px 4px 12px;
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: 8px;
     }
 
-    /* Big, easy-to-tap product cards */
+    .section-count {
+      font-size: 13px;
+      font-weight: 700;
+      color: #6b7280;
+      background: #e5e7eb;
+      padding: 3px 9px;
+      border-radius: 999px;
+    }
+
     .card-list {
       display: flex;
       flex-direction: column;
@@ -172,7 +220,6 @@
       line-height: 1.4;
     }
 
-    /* Classic unmistakable Amazon yellow button */
     .amazon-btn {
       display: block;
       width: 100%;
@@ -189,6 +236,10 @@
 
     .product-card:hover .amazon-btn {
       background: #f7ca00;
+    }
+
+    .bottom-actions {
+      margin-top: 22px;
     }
 
     .footer {
@@ -219,9 +270,17 @@
       </div>
     </header>
 
-    <h2 class="section-heading">📚 Top 4 Must-Read Engineering Books</h2>
-    <div class="card-list">
+    <div class="action-bar">
+      <button type="button" class="shuffle-btn" onclick="shufflePicks()">🔄 Show New Picks</button>
+      <button type="button" class="showall-btn" id="toggle-all-btn" onclick="toggleShowAll()">📋 Show All (24)</button>
+    </div>
 
+    <h2 class="section-heading">
+      <span>📚 Must-Read Engineering Books</span>
+      <span class="section-count" id="books-count">Showing 4 of 12</span>
+    </h2>
+    <div class="card-list" id="books-list">
+      <!-- Pre-rendered default cards for instant load & no-JS crawlers -->
       <a class="product-card" href="https://www.amazon.com/dp/0306812835?tag=builtuncovere-20" target="_blank" rel="noopener sponsored">
         <div class="card-top">
           <div class="thumb-box">
@@ -277,12 +336,13 @@
         </div>
         <div class="amazon-btn">Check Price on Amazon →</div>
       </a>
-
     </div>
 
-    <h2 class="section-heading">🚜 Collector Models &amp; Everyday Tools</h2>
-    <div class="card-list">
-
+    <h2 class="section-heading">
+      <span>🚜 Collector Models &amp; Everyday Tools</span>
+      <span class="section-count" id="gear-count">Showing 4 of 12</span>
+    </h2>
+    <div class="card-list" id="gear-list">
       <a class="product-card" href="https://www.amazon.com/s?k=Diecast+Masters+Caterpillar+1+50+scale+High+Line&tag=builtuncovere-20" target="_blank" rel="noopener sponsored">
         <div class="card-top">
           <div class="thumb-box">🚜</div>
@@ -330,7 +390,10 @@
         </div>
         <div class="amazon-btn">Check Price on Amazon →</div>
       </a>
+    </div>
 
+    <div class="action-bar bottom-actions">
+      <button type="button" class="shuffle-btn" onclick="shufflePicks(); window.scrollTo({top: 0, behavior: 'smooth'});">🔄 Show 8 Different Picks</button>
     </div>
 
     <footer class="footer">
@@ -339,5 +402,259 @@
     </footer>
   </main>
 
+  <script>
+    const TAG = "builtuncovere-20";
+
+    const BOOKS_POOL = [
+      {
+        badge: "#1 Fan Favorite",
+        title: "Structures: Or Why Things Don't Fall Down",
+        desc: "Plain-English explanation of why giant bridges, dams, and skyscrapers stand—or collapse.",
+        isbn: "0306812835"
+      },
+      {
+        badge: "Structural Forensics",
+        title: "Why Buildings Fall Down: How Structures Fail",
+        desc: "Illustrated real-world investigations into famous structural collapses, foundations, and load paths.",
+        isbn: "039331152X"
+      },
+      {
+        badge: "Hoover Dam & Water Wars",
+        title: "Cadillac Desert: The American West & Its Water",
+        desc: "The true story behind Hoover Dam, Glen Canyon, and America's biggest water megaprojects.",
+        isbn: "0140178244"
+      },
+      {
+        badge: "Pulitzer Prize Winner",
+        title: "The Power Broker (Robert A. Caro)",
+        desc: "How one master builder used bridges, tunnels, and zoning laws to reshape New York.",
+        isbn: "0394720245"
+      },
+      {
+        badge: "Engineering Classic",
+        title: "To Engineer Is Human (Henry Petroski)",
+        desc: "How historic structural miscalculations and bridge failures rewrote modern US building codes.",
+        isbn: "0679734163"
+      },
+      {
+        badge: "Cold War Bunkers",
+        title: "Command and Control (Eric Schlosser)",
+        desc: "Inside America's declassified underground Titan II missile silos and Cold War defense megaprojects.",
+        isbn: "0143125788"
+      },
+      {
+        badge: "US Railroad History",
+        title: "Nothing Like It in the World (Stephen Ambrose)",
+        desc: "How engineers blasted through solid mountain granite to build the Transcontinental Railroad.",
+        isbn: "0743203178"
+      },
+      {
+        badge: "Brooklyn Bridge",
+        title: "The Great Bridge (David McCullough)",
+        desc: "How wooden caissons, steel wire cables, and human grit built America's iconic suspension bridge.",
+        isbn: "0743264746"
+      },
+      {
+        badge: "Panama Canal",
+        title: "The Path Between the Seas (David McCullough)",
+        desc: "The monumental story of locks, dams, landslides, and steam shovels that connected two oceans.",
+        isbn: "0684830019"
+      },
+      {
+        badge: "Secret Aerospace",
+        title: "Skunk Works: My Years at Lockheed (Ben Rich)",
+        desc: "Inside the classified engineering hangar that built the SR-71 Blackbird, U-2, and F-117 stealth jet.",
+        isbn: "0385495536"
+      },
+      {
+        badge: "Skyscraper History",
+        title: "City in the Sky: World Trade Center (James Glanz)",
+        desc: "How structural engineers invented the steel tube-frame design to hold up 110 stories against wind.",
+        isbn: "0142000280"
+      },
+      {
+        badge: "Freight & Megaports",
+        title: "The Box: Shipping Container & Global Trade",
+        desc: "How standardized steel containers, giant port cranes, and freight rail rebuilt modern commerce.",
+        isbn: "0393334910"
+      }
+    ];
+
+    const GEAR_POOL = [
+      {
+        emoji: "🚜",
+        badge: "Heavy Metal Diecast",
+        title: "Caterpillar (CAT) 1:50 Scale Collector Models",
+        desc: "Heavy diecast metal excavators, bulldozers, and mining trucks for your desk or shelf.",
+        query: "Diecast+Masters+Caterpillar+1+50+scale+High+Line",
+        btn: "View Models on Amazon →"
+      },
+      {
+        emoji: "🗽",
+        badge: "Desk Display Sets",
+        title: "LEGO Architecture US Landmarks & Skylines",
+        desc: "Build the New York City Skyline, Empire State Building, and Statue of Liberty.",
+        query: "LEGO+Architecture+New+York+Statue+of+Liberty+Skyline",
+        btn: "View Sets on Amazon →"
+      },
+      {
+        emoji: "🚂",
+        badge: "HO Scale Rail",
+        title: "Bachmann US Diesel Freight Train Sets (HO Scale)",
+        desc: "Authentic American heavy-haul diesel-electric locomotives and freight car sets.",
+        query: "Bachmann+Trains+HO+Scale+American+Freight+Train+Set",
+        btn: "View Train Sets on Amazon →"
+      },
+      {
+        emoji: "🚀",
+        badge: "NASA Collector",
+        title: "NASA Apollo Saturn V & Space Shuttle Scale Models",
+        desc: "Detailed multi-stage display replicas of America's heaviest launch vehicles.",
+        query: "NASA+Apollo+Saturn+V+scale+model+display+kit",
+        btn: "View Models on Amazon →"
+      },
+      {
+        emoji: "⚙️",
+        badge: "Working Metal Engine",
+        title: "All-Metal Hot Air Stirling Engine Desk Model",
+        desc: "Working brushed-aluminum thermodynamic engine that turns heat into real motion on your desk.",
+        query: "Metal+Stirling+Engine+Model+Kit+Desk",
+        btn: "Check Price on Amazon →"
+      },
+      {
+        emoji: "🌉",
+        badge: "Truss & Arch Lab",
+        title: "Structural Engineering Bridges & Skyscrapers Kit",
+        desc: "Hands-on truss, suspension, and arch bridge models demonstrating real structural forces.",
+        query: "Thames+and+Kosmos+Structural+Engineering+Bridges+Skyscrapers+Kit",
+        btn: "Check Price on Amazon →"
+      },
+      {
+        emoji: "📏",
+        badge: "Pocket Laser Tape",
+        title: "Bosch Laser Distance Measurer (165 ft)",
+        desc: "Point and click to measure any room, garage, or building span in under 1 second.",
+        query: "Bosch+BLAZE+Laser+Distance+Measure",
+        btn: "Check Price on Amazon →"
+      },
+      {
+        emoji: "🛠️",
+        badge: "Made in USA Gear",
+        title: "Leatherman Wave+ 18-in-1 Heavy Duty Multi-Tool",
+        desc: "The classic stainless-steel everyday carry tool trusted by field engineers.",
+        query: "Leatherman+Wave+Plus+Multitool",
+        btn: "Check Price on Amazon →"
+      },
+      {
+        emoji: "📐",
+        badge: "0.0005\" Precision",
+        title: "Mitutoyo Stainless Digital Caliper (0–6 inch)",
+        desc: "The gold-standard stainless steel digital caliper used in US aerospace and machine shops.",
+        query: "Mitutoyo+500-196-30+Digital+Caliper",
+        btn: "Check Price on Amazon →"
+      },
+      {
+        emoji: "🌡️",
+        badge: "Thermal X-Ray",
+        title: "Klein Tools Handheld Thermal Imaging Camera",
+        desc: "Spot hidden wall leaks, overloaded breakers, heat loss, and mechanical friction instantly.",
+        query: "Klein+Tools+Thermal+Imager+Camera",
+        btn: "Check Price on Amazon →"
+      },
+      {
+        emoji: "☕",
+        badge: "Jobsite Classic",
+        title: "Stanley Classic Vacuum Insulated Steel Bottle",
+        desc: "The hammertone-green steel thermos carried by American bridge, rail, and dam crews since 1913.",
+        query: "Stanley+Classic+Legendary+Bottle+Hammertone+Green",
+        btn: "Check Price on Amazon →"
+      },
+      {
+        emoji: "📓",
+        badge: "All-Weather Field",
+        title: "Rite in the Rain Weatherproof Engineering Notebook",
+        desc: "Made in Tacoma, WA — waterproof grid paper that writes cleanly through rain, grease, and mud.",
+        query: "Rite+in+the+Rain+Weatherproof+Engineering+Field+Book+Kit",
+        btn: "Check Price on Amazon →"
+      }
+    ];
+
+    let showingAll = false;
+
+    function shuffledCopy(arr) {
+      const copy = arr.slice();
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = copy[i];
+        copy[i] = copy[j];
+        copy[j] = tmp;
+      }
+      return copy;
+    }
+
+    function renderBookCard(b) {
+      const url = `https://www.amazon.com/dp/${b.isbn}?tag=${TAG}`;
+      const cover = `https://covers.openlibrary.org/b/isbn/${b.isbn}-L.jpg`;
+      return `
+        <a class="product-card" href="${url}" target="_blank" rel="noopener sponsored">
+          <div class="card-top">
+            <div class="thumb-box">
+              <img src="${cover}" alt="${b.title}" loading="lazy" />
+            </div>
+            <div class="card-info">
+              <span class="tag-pill">${b.badge}</span>
+              <div class="card-title">${b.title}</div>
+              <div class="card-desc">${b.desc}</div>
+            </div>
+          </div>
+          <div class="amazon-btn">Check Price on Amazon →</div>
+        </a>
+      `;
+    }
+
+    function renderGearCard(g) {
+      const url = `https://www.amazon.com/s?k=${g.query}&tag=${TAG}`;
+      return `
+        <a class="product-card" href="${url}" target="_blank" rel="noopener sponsored">
+          <div class="card-top">
+            <div class="thumb-box">${g.emoji}</div>
+            <div class="card-info">
+              <span class="tag-pill">${g.badge}</span>
+              <div class="card-title">${g.title}</div>
+              <div class="card-desc">${g.desc}</div>
+            </div>
+          </div>
+          <div class="amazon-btn">${g.btn}</div>
+        </a>
+      `;
+    }
+
+    function renderLists(books, gear) {
+      document.getElementById("books-list").innerHTML = books.map(renderBookCard).join("");
+      document.getElementById("gear-list").innerHTML = gear.map(renderGearCard).join("");
+      document.getElementById("books-count").textContent = `Showing ${books.length} of ${BOOKS_POOL.length}`;
+      document.getElementById("gear-count").textContent = `Showing ${gear.length} of ${GEAR_POOL.length}`;
+      document.getElementById("toggle-all-btn").textContent = showingAll ? "✨ Show 8 Random Picks" : "📋 Show All (24)";
+    }
+
+    function shufflePicks() {
+      showingAll = false;
+      const books = shuffledCopy(BOOKS_POOL).slice(0, 4);
+      const gear = shuffledCopy(GEAR_POOL).slice(0, 4);
+      renderLists(books, gear);
+    }
+
+    function toggleShowAll() {
+      showingAll = !showingAll;
+      if (showingAll) {
+        renderLists(BOOKS_POOL, GEAR_POOL);
+      } else {
+        shufflePicks();
+      }
+    }
+
+    // Automatically randomize the 4+4 picks on every visit
+    window.addEventListener("DOMContentLoaded", shufflePicks);
+  </script>
 </body>
 </html>
